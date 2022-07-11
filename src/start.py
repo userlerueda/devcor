@@ -6,6 +6,7 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 (MVC) pattern in a meaningful and somewhat realistic way.
 """
 
+import os
 from flask import Flask, render_template, request
 from database import Database
 
@@ -14,7 +15,26 @@ from database import Database
 app = Flask(__name__)
 
 # Load initial account data from JSON file
-db = Database("data/initial.json")
+db = Database("mysql://root:globomantics@db/db", "data/initial.json")
+
+
+@app.before_request
+def before_request():
+    """
+    Before each request, connect to the database.
+    """
+    db.connect()
+    app.logger.debug("Connected to database")
+
+
+@app.after_request
+def after_request(response):
+    """
+    After each request, disconnect from the database.
+    """
+    db.disconnect()
+    app.logger.debug("Disconnected from database")
+    return response
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -49,4 +69,5 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    ctx = ("../ssl/cert.pem", "../ssl/key.pem")
+    app.run(host="0.0.0.0", debug=True, use_reloader=False, ssl_context=ctx)

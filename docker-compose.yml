@@ -4,9 +4,17 @@
 version: "3.7"
 
 services:
-  crm:
+  web:
     build: "."
-    image: "crm:latest"
+    image: "flask:latest"
     ports:
       - "5000:5000/tcp"
+
+  db:
+    image: "mysql:latest"
+    command: "--default-authentication-plugin=mysql_native_password"
+    environment:
+      MYSQL_ROOT_PASSWORD: "globomantics"
+      MYSQL_DATABASE: "db"
+
 ...

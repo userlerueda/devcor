@@ -1,14 +1,5 @@
-{
-  "ACCT100": {
-    "paid": 60,
-    "due": 100
-  },
-  "ACCT200": {
-    "paid": 70,
-    "due": 60
-  },
-  "ACCT300": {
-    "paid": 0,
-    "due": 0
-  }
-}
+[
+  { "acctid": "ACCT100", "paid": 60, "due": 100 },
+  { "acctid": "ACCT200", "paid": 70, "due": 60 },
+  { "acctid": "ACCT300", "paid": 0, "due": 0 }
+]

@@ -7,6 +7,8 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 """
 
 import json
+import time
+from sqlalchemy import create_engine, Table, Column, Float, String, MetaData
 
 
 class Database:
@@ -15,16 +17,57 @@ class Database:
     simple file such as JSON, YAML, or XML. Uses JSON by default.
     """
 
-    def __init__(self, path):
+    def __init__(self, db_url, seed_path):
         """
-        Constructor to initialize the data attribute as
-        a dictionary where the account number is the key and
-        the value is another dictionary with keys "paid" and "due".
+        Constructor builds the object. Path determines what kind of SQL
+        database should be used. Can be MySQL, sqlite, postgreSQL, etc.
         """
 
-        # Open the specified database file for reading and perform loading
-        with open(path, "r") as handle:
-            self.data = json.load(handle)
+        for _ in range(10):
+            try:
+                self.engine = create_engine(db_url)
+                self.meta = MetaData(self.engine)
+
+                self.table = Table(
+                    "accounts",
+                    self.meta,
+                    Column("acctid", String(15), primary_key=True),
+                    Column("paid", Float, nullable=False),
+                    Column("due", Float, nullable=False),
+                )
+
+                self.meta.create_all()
+                self.connect()
+                break
+
+            except Exception as e:
+                time.sleep(5)
+
+        if not hasattr(self, "conn") or self.conn.closed:
+            raise TimeoutError("Could not establish session to mysql_db")
+
+        with open(seed_path, "r") as handle:
+            data = json.load(handle)
+
+        self.result = self.conn.execute(self.table.insert(), data)
+        self.disconnect()
+
+    def connect(self):
+        """
+        Open (connect) the connection to the database.
+        """
+        self.conn = self.engine.connect()
+        if self.conn.closed:
+            raise OSError("connect() succeeded but connection is still closed")
+
+    def disconnect(self):
+        """
+        Close (disconnect) the connection to the database.
+        """
+        if hasattr(self, "conn") and not self.conn.closed:
+            self.conn.close()
+            if not self.conn.closed:
+                raise OSError("disconnect() succeded but session is still open")
 
     def balance(self, acct_id):
         """
@@ -35,7 +78,11 @@ class Database:
         owes us money and a negative number means they overpaid and have
         a credit with us.
         """
-        acct = self.data.get(acct_id)
+        selected_acct = self.table.select().where(
+            self.table.c.acctid == acct_id.upper()
+        )
+        result = self.conn.execute(selected_acct)
+        acct = result.fetchone()
         if acct:
             bal = float(acct["due"]) - float(acct["paid"])
             return f"{bal:.2f} USD"
