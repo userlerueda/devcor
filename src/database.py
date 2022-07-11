@@ -40,7 +40,7 @@ class Database:
                 self.connect()
                 break
 
-            except Exception as e:
+            except Exception:
                 time.sleep(5)
 
         if not hasattr(self, "conn") or self.conn.closed:
