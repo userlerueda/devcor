@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.7, 3.8]
 
     steps:
       - name: Checkout repo
@@ -32,5 +32,11 @@ jobs:
         run: pylint src/*.py
       - name: Run Bandit tests
         run: bandit src/*.py --skip B101
-      - name: Run PyTest tests
+      - name: Run Unit tests
         run: pytest src/test_unit.py
+      - name: Bring App Up
+        run: docker-compose up -d
+      - name: Wait for App to be Up
+        run: ./wait_for_https.sh 60
+      - name: Run System Tests
+        run: pytest src/test_system.py
