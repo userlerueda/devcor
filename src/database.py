@@ -9,7 +9,8 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 import json
 import time
 
-from sqlalchemy import Column, Float, MetaData, String, Table, create_engine
+from sqlalchemy import (Column, Float, MetaData, String, Table, create_engine,
+                        exc)
 
 
 class Database:
@@ -41,7 +42,7 @@ class Database:
                 self.connect()
                 break
 
-            except Exception as err:
+            except exc.SQLAlchemyError as err:
                 print(f"Failed to connect to database: {err}")
                 time.sleep(5)
 
