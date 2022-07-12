@@ -1,6 +1,6 @@
 # Begin with a minimal Alpine Linux Python 3.7.3 container, which is the
 # same version we used for our development.
-FROM python:3.7-alpine
+FROM python:3-alpine
 LABEL maintainer="njrusmc@gmail.com"
 
 # Change into the correct directory. WORKDIR is the Docker best practice

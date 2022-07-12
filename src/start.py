@@ -6,38 +6,39 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 (MVC) pattern in a meaningful and somewhat realistic way.
 """
 
-import os
 from flask import Flask, render_template, request
+from flask.logging import create_logger
+
 from database import Database
 
-
 # Create Flask object
-app = Flask(__name__)
+APP = Flask(__name__)
+LOGGER = create_logger(APP)
 
 # Load initial account data from JSON file
 db = Database("mysql://root:globomantics@db/db", "data/initial.json")
 
 
-@app.before_request
+@APP.before_request
 def before_request():
     """
     Before each request, connect to the database.
     """
     db.connect()
-    app.logger.debug("Connected to database")
+    LOGGER.debug("Connected to database")
 
 
-@app.after_request
+@APP.after_request
 def after_request(response):
     """
     After each request, disconnect from the database.
     """
     db.disconnect()
-    app.logger.debug("Disconnected from database")
+    LOGGER.debug("Disconnected from database")
     return response
 
 
-@app.route("/", methods=["GET", "POST"])
+@APP.route("/", methods=["GET", "POST"])
 def index():
     """
     This is a view function which responds to requests for the top-level
@@ -54,7 +55,7 @@ def index():
         # the account balance).
         acct_id = request.form["acctid"]
         acct_balance = db.balance(acct_id.upper())
-        app.logger.debug(f"balance for {acct_id}: {acct_balance}")
+        LOGGER.debug("balance for %s: %s", acct_id, acct_balance)
 
     else:
         # During a normal GET request, no need to perform any calculations
@@ -70,4 +71,4 @@ def index():
 
 if __name__ == "__main__":
     ctx = ("../ssl/cert.pem", "../ssl/key.pem")
-    app.run(host="0.0.0.0", debug=True, use_reloader=False, ssl_context=ctx)    #nosec
+    APP.run(host="0.0.0.0", debug=True, use_reloader=False, ssl_context=ctx)    #nosec

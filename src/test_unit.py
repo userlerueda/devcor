@@ -7,11 +7,12 @@ Used to illustrate Test Driven Development (TDD) and DevOps CI/CD.
 """
 
 import pytest
+
 import database
 
 
-@pytest.fixture(scope="module")
-def db_mock():
+@pytest.fixture(scope="module", name="db_mock")
+def fixture_db_mock():
     """
     Test fixture setup to create a sample database from "model" data.
     """

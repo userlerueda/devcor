@@ -8,7 +8,8 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 
 import json
 import time
-from sqlalchemy import create_engine, Table, Column, Float, String, MetaData
+
+from sqlalchemy import Column, Float, MetaData, String, Table, create_engine
 
 
 class Database:
@@ -40,13 +41,14 @@ class Database:
                 self.connect()
                 break
 
-            except Exception:
+            except Exception as err:
+                print(f"Failed to connect to database: {err}")
                 time.sleep(5)
 
         if not hasattr(self, "conn") or self.conn.closed:
             raise TimeoutError("Could not establish session to mysql_db")
 
-        with open(seed_path, "r") as handle:
+        with open(seed_path, "r", encoding="utf-8") as handle:
             data = json.load(handle)
 
         self.result = self.conn.execute(self.table.insert(), data)
