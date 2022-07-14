@@ -26,17 +26,18 @@
                 <article>
                     <header>
                         <form action="" method="post">
-                          <article>
-                            <p>Enter account ID (e.g. ACCT100): <input type="text" name="acctid"></p>
-                            <p><button type="submit">Submit</button></p>
-                            {# This is a comment in jinja2, but the "if" statement below #}
-                            {# prints the account balance if acct_balance defined #}
-                            {% if acct_balance is not none %}
-                              <p>Account balance: {{ acct_balance }}</p>
-                            {% else %}
-                              <p>Unknown account number; please try again</p>
-                            {% endif %}
-                          </article>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <article>
+                                <p>Enter account ID (e.g. ACCT100): <input type="text" name="acctid"></p>
+                                <p><button type="submit">Submit</button></p>
+                                {# This is a comment in jinja2, but the "if" statement below #}
+                                {# prints the account balance if acct_balance defined #}
+                                {% if acct_balance is not none %}
+                                <p>Account balance: {{ acct_balance }}</p>
+                                {% else %}
+                                <p>Unknown account number; please try again</p>
+                                {% endif %}
+                            </article>
                         </form>
                     </header>
                 </article>
