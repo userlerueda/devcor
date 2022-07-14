@@ -6,13 +6,17 @@ Purpose: A simple Flask web app that demonstrates the Model View Controller
 (MVC) pattern in a meaningful and somewhat realistic way.
 """
 
+import os
+
 from flask import Flask, render_template, request
 from flask.logging import create_logger
+from flask_wtf.csrf import CSRFProtect
 
 from database import Database
 
 # Create Flask object
 APP = Flask(__name__)
+CSRF = CSRFProtect(APP)
 LOGGER = create_logger(APP)
 
 # Load initial account data from JSON file
@@ -70,5 +74,11 @@ def index():
 
 
 if __name__ == "__main__":
+    # Identify the certificate and key files for the server
     ctx = ("../ssl/cert.pem", "../ssl/key.pem")
+
+    # Assign random flask secret key to assis with CSRF
+    APP.secret_key = os.urandom(24)
+
+    # Start the server
     APP.run(host="0.0.0.0", debug=True, use_reloader=False, ssl_context=ctx)    #nosec
